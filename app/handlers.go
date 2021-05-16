@@ -3,8 +3,8 @@ package app
 import (
 	"encoding/json"
 	"encoding/xml"
-	"fmt"
 	"net/http"
+	"github.com/sdoshi579/go-practice/service"
 )
 
 type Customer struct {
@@ -13,16 +13,13 @@ type Customer struct {
 	Zipcode string 	`json:"zip_code"`
 }
 
-func greet(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Hello World !!!")
+type CustomerHandlers struct {
+	service service.CustomerService
 }
 
-func getAllCustomers(w http.ResponseWriter, r *http.Request) {
-	customers := []Customer{
-		{"Sharukh", "Mumbai", "400086"},
-		{"Amitabh", "Mumbai", "400086"},
-	}
-
+func (ch *CustomerHandlers) getAllCustomers(w http.ResponseWriter, r *http.Request) {
+	
+	customers, _ := ch.service.GetAllCustomer()
 	if r.Header.Get("Content-Type") == "application/xml" {
 		w.Header().Add("Content-Type", "application/xml")
 		xml.NewEncoder(w).Encode(customers)
