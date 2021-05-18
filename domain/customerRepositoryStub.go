@@ -1,5 +1,7 @@
 package domain
 
+import "github.com/sdoshi579/go-practice/errs"
+
 type CustomerRepositoryStub struct {
 	customers []Customer
 }
@@ -8,7 +10,7 @@ func (s CustomerRepositoryStub) FindAll() ([]Customer, error) {
 	return s.customers, nil
 }
 
-func (s CustomerRepositoryStub) FindById(id string) (*Customer, error) {
+func (s CustomerRepositoryStub) FindById(id string) (*Customer, *errs.AppError) {
 	return &s.customers[0], nil
 }
 

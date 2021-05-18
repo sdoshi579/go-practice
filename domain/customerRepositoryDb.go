@@ -6,6 +6,7 @@ import (
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/sdoshi579/go-practice/errs"
 )
 
 
@@ -38,7 +39,7 @@ func (d CustomerRepositoryDb) FindAll() ([]Customer, error) {
 	return customers, nil
 }
 
-func (d CustomerRepositoryDb) FindById(id string) (*Customer, error) {
+func (d CustomerRepositoryDb) FindById(id string) (*Customer, *errs.AppError) {
 
 	findAllSql := "select * from customers where customer_id = " + id
 
@@ -47,8 +48,11 @@ func (d CustomerRepositoryDb) FindById(id string) (*Customer, error) {
 	var c Customer
 	err := rows.Scan(&c.Id, &c.Name, &c.DateOfBirth, &c.City, &c.Zipcode, &c.Status)
 	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, errs.NewNotFoundError("Customer not found")
+		}
 		log.Println("Error in scanning customers for id " + err.Error())
-		return nil, err
+		return nil, errs.NewInternalServerError("unexpected database error")
 	}
 	return &c, nil
 }
