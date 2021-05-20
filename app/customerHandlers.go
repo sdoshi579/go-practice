@@ -3,18 +3,11 @@ package app
 import (
 	"encoding/json"
 	"encoding/xml"
-	"fmt"
 	"net/http"
 
 	"github.com/gorilla/mux"
 	"github.com/sdoshi579/go-practice/service"
 )
-
-type Customer struct {
-	Name 	string 	`json:"full_name"`
-	City 	string 	`json:"city"`
-	Zipcode string 	`json:"zip_code"`
-}
 
 type CustomerHandlers struct {
 	service service.CustomerService
@@ -27,8 +20,7 @@ func (ch *CustomerHandlers) getAllCustomers(w http.ResponseWriter, r *http.Reque
 		w.Header().Add("Content-Type", "application/xml")
 		xml.NewEncoder(w).Encode(customers)
 	} else {
-		w.Header().Add("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(customers)
+		decorateResponse(w, http.StatusOK, customers)
 	}
 }
 
@@ -38,10 +30,16 @@ func (ch *CustomerHandlers) getCustomer(w http.ResponseWriter, r *http.Request) 
 	customers, err := ch.service.GetCustomer(vars["customer_id"])
 
 	if err != nil {
-		w.WriteHeader(err.Code)
-		fmt.Fprintln(w, err.Message)
+		decorateResponse(w, err.Code, err.AsMessage())
 	} else {
-		w.Header().Add("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(customers)
+		decorateResponse(w, http.StatusOK, customers)
+	}
+}
+
+func decorateResponse(w http.ResponseWriter, statusCode int, data interface{}) {
+	w.Header().Add("Content-Type", "application/json")
+	w.WriteHeader(statusCode)
+	if err := json.NewEncoder(w).Encode(data); err != nil {
+		panic(err)
 	}
 }
