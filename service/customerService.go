@@ -4,7 +4,7 @@ import "github.com/sdoshi579/go-practice/domain"
 import "github.com/sdoshi579/go-practice/errs"
 
 type CustomerService interface {
-	GetAllCustomer() ([]domain.Customer, error)
+	GetAllCustomer() ([]domain.Customer, *errs.AppError)
 	GetCustomer(string) (*domain.Customer, *errs.AppError)
 }
 
@@ -12,7 +12,7 @@ type DefaultCustomerService struct {
 	repo domain.CustomerRepository
 }
 
-func (s DefaultCustomerService) GetAllCustomer() ([]domain.Customer, error) {
+func (s DefaultCustomerService) GetAllCustomer() ([]domain.Customer, *errs.AppError) {
 	return s.repo.FindAll()
 }
 

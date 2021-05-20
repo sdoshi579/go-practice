@@ -14,7 +14,7 @@ type CustomerRepositoryDb struct {
 	client *sql.DB
 }
 
-func (d CustomerRepositoryDb) FindAll() ([]Customer, error) {
+func (d CustomerRepositoryDb) FindAll() ([]Customer, *errs.AppError) {
 	
 
 	findAllSql := "select * from customers"
@@ -22,7 +22,7 @@ func (d CustomerRepositoryDb) FindAll() ([]Customer, error) {
 	rows, err := d.client.Query(findAllSql)
 	if err != nil {
 		log.Println("Error in fetching customers " + err.Error())
-		return nil, err
+		return nil, errs.NewInternalServerError("uexpected error")
 	}
 
 	customers := make([]Customer, 0)
@@ -31,7 +31,7 @@ func (d CustomerRepositoryDb) FindAll() ([]Customer, error) {
 		err := rows.Scan(&c.Id, &c.Name, &c.DateOfBirth, &c.City, &c.Zipcode, &c.Status)
 		if err != nil {
 			log.Println("Error in scanning customers " + err.Error())
-			return nil, err
+			return nil, errs.NewInternalServerError("unexpected error")
 		}
 		customers = append(customers, c)
 	}
