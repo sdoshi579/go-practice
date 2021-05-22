@@ -7,6 +7,7 @@ import (
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/sdoshi579/go-practice/errs"
+	"github.com/sdoshi579/go-practice/logger"
 )
 
 
@@ -24,7 +25,7 @@ func (d CustomerRepositoryDb) FindAll(status string) ([]Customer, *errs.AppError
 	}
 	rows, err := d.client.Query(findAllSql)
 	if err != nil {
-		log.Println("Error in fetching customers " + err.Error())
+		logger.Error("Error in fetching customers " + err.Error())
 		return nil, errs.NewInternalServerError("uexpected error")
 	}
 
@@ -33,7 +34,7 @@ func (d CustomerRepositoryDb) FindAll(status string) ([]Customer, *errs.AppError
 		var c Customer
 		err := rows.Scan(&c.Id, &c.Name, &c.DateOfBirth, &c.City, &c.Zipcode, &c.Status)
 		if err != nil {
-			log.Println("Error in scanning customers " + err.Error())
+			logger.Error("Error in scanning customers " + err.Error())
 			return nil, errs.NewInternalServerError("unexpected error")
 		}
 		customers = append(customers, c)
@@ -54,7 +55,7 @@ func (d CustomerRepositoryDb) FindById(id string) (*Customer, *errs.AppError) {
 		if err == sql.ErrNoRows {
 			return nil, errs.NewNotFoundError("Customer not found")
 		}
-		log.Println("Error in scanning customers for id " + err.Error())
+		logger.Error("Error in scanning customers for id " + err.Error())
 		return nil, errs.NewInternalServerError("unexpected database error")
 	}
 	return &c, nil
