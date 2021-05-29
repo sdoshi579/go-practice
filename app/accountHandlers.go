@@ -29,3 +29,22 @@ func (ah *AccountHandlers) createAccount(w http.ResponseWriter, r *http.Request)
 	}
 	decorateResponse(w, http.StatusCreated, accountResponse)
 }
+
+func (ah *AccountHandlers) createTransaction(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	var transactionRequest dto.TransactionRequest
+	err := json.NewDecoder(r.Body).Decode(&transactionRequest)
+	if err != nil {
+		decorateResponse(w, http.StatusBadRequest, err)
+		return
+	}
+	transactionRequest.CustomerId = vars["customer_id"]
+	transactionRequest.AccountId = vars["account_id"]
+	accountResponse, appError := ah.service.NewTransaction(transactionRequest)
+	if appError != nil {
+		decorateResponse(w, appError.Code, appError.Message)
+		return
+	}
+	decorateResponse(w, http.StatusCreated, accountResponse)
+}
+

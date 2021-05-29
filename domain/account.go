@@ -11,6 +11,18 @@ type Account struct {
 	Status 		string
 }
 
+type Transact struct {
+	Id			string
+	AccountId 	string
+	CustomerId 	string
+	Date 		string
+	Type 		string
+	Amount 		float64
+	NewAmount	float64
+}
+
 type AccountRepository interface {
 	Save(Account) (*Account, *errs.AppError)
+	Transact(Transact) (*Transact, *errs.AppError)
+	GetCustomerAccountAmount(string, string) (*float64, *errs.AppError)
 }
